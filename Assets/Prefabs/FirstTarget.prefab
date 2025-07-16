@@ -155,3 +155,4 @@ MonoBehaviour:
   - {fileID: 3091620869358845551, guid: 970232fe068164e04b949f49e9425622, type: 3}
   defaultColor: {r: 0, g: 1, b: 0, a: 1}
   activeColor: {r: 1, g: 0, b: 0, a: 1}
+  destructionEffectPrefab: {fileID: 186387463177037040, guid: 9c95b622d97c54c509bf5bd8e389490d, type: 3}

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,6 +26,15 @@ public class PlayerController : MonoBehaviour
 
     // Bir onceki gezegeni hafizada tutmak icin bir degisken
     private Planet previousPlanet;
+
+    // --- Planet ---
+    [Header("Core Dependencies")]
+    [SerializeField] private GameObject planetPrefab;
+    [SerializeField] private List<GameObject> enemySetPrefabs;
+    [SerializeField] private GameObject destructionEffectPrefab;
+
+    // --- Hafiza icin yeni degiskenler ---
+    private GameObject activeEnemySet; // Sahnedeki aktif dusman setini hafizada tutacagiz.
 
     private void Awake()
     {
@@ -73,44 +83,80 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Eger bir 'Guardian' etiketli dusmana carparsak...
+        // Dusmana carpma mantigi
         if (other.CompareTag("Guardian"))
         {
-            Debug.Log("Dusmana carptin! Oyun Bitti.");
-
-            // SceneManager.GetActiveScene().buildIndex -> su anki sahnenin sira numarasini verir.
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
-            // Kodun devam etmesini engellemek icin buradan cik.
             return;
-
         }
-        // Sadece fırlatılmış durumdaysak ve doğru hedefe çarptıysak...
+
+        // Sadece firlatilmis durumdaysak ve dogru hedefe carptiysak...
         if (currentState == PlayerState.Dashing && other.transform == nextTarget)
         {
-            // Eger bir onceki gezegen hafizada varsa (StartPlanet haric diger hepsi icin gecerli)...
-            if (previousPlanet != null)
-            {
-                // Bir onceki gezegene, kendi dusman setini yok etmesini soyle.
-                previousPlanet.DestroyMyEnemySet();
-            }
-            // Yeni gezegene kenetlen
+            // --- YENI MANTIK AKISI ---
+
+            // 1. Yeni gezegene kenetlen
             AttachToPlanet(other.transform);
 
-            // Ulaştığımız gezegenden bir sonraki hedefi isteyelim.
+            // 2. Ulastigimiz gezegeni 'aktif' et (rengini kirmizi yap).
             Planet targetPlanet = other.GetComponent<Planet>();
             if (targetPlanet != null)
             {
-                // Ulastigimiz yeni gezegeni, bir sonraki adimda 'bir onceki gezegen' olarak atamak icin hafizaya aliyoruz.
-                previousPlanet = targetPlanet;
-
-                nextTarget = targetPlanet.ActivateAndSpawnNext();
+                targetPlanet.Activate();
             }
+
+            // 3. Bir onceki (artik aktif olan) dusman setini yok et.
+            DestroyPreviousEnemySet();
+
+            // 4. Yeni bir gezegen ve onun etrafinda bir dusman seti olustur.
+            SpawnNewPlanetAndEnemies(other.transform);
         }
     }
 
-    // Oyuncuyu durduran, kenetleyen ve bekleme moduna alan yeni yardımcı fonksiyonumuz.
-    private void AttachToPlanet(Transform planetTransform)
+    private void SpawnNewPlanetAndEnemies(Transform originPlanet)
+    {
+        // 1. Bir sonraki hedef gezegeni olustur
+        float minDistance = 8f, maxDistance = 14f;
+        float randomAngle = Random.Range(-60f, 90f);
+        float randomDistance = Random.Range(minDistance, maxDistance);
+        Vector2 direction = new Vector2(Mathf.Cos(randomAngle * Mathf.Deg2Rad), Mathf.Sin(randomAngle * Mathf.Deg2Rad));
+        Vector2 spawnPosition = (Vector2)originPlanet.position + (direction * randomDistance);
+
+        GameObject newPlanetObject = Instantiate(planetPrefab, spawnPosition, Quaternion.identity);
+        nextTarget = newPlanetObject.transform; // Oyuncunun yeni hedefini belirle.
+
+        // 2. O yeni gezegenin etrafinda bir dusman seti olustur.
+        if (enemySetPrefabs != null && enemySetPrefabs.Count > 0)
+        {
+            int randomIndex = Random.Range(0, enemySetPrefabs.Count);
+            GameObject chosenEnemySetPrefab = enemySetPrefabs[randomIndex];
+
+            // Dusman setini, yeni olusan 'nextTarget'in pozisyonunda olusturuyoruz!
+            // ve bir sonraki adimda silebilmek icin hafizaya aliyoruz.
+            activeEnemySet = Instantiate(chosenEnemySetPrefab, nextTarget.position, Quaternion.identity);
+        }
+    }
+
+    private void DestroyPreviousEnemySet()
+    {
+        // Eger hafizada yok edilecek bir dusman seti varsa...
+        if (activeEnemySet != null)
+        {
+            // Her bir dusman icin bir yok olma efekti olustur (animasyon)
+            if (destructionEffectPrefab != null)
+            {
+                foreach (Transform guardian in activeEnemySet.transform)
+                {
+                    Instantiate(destructionEffectPrefab, guardian.position, Quaternion.identity);
+                }
+            }
+            // Ve ana dusman seti objesini yok et.
+            Destroy(activeEnemySet);
+        }
+    }
+
+// Oyuncuyu durduran, kenetleyen ve bekleme moduna alan yeni yardımcı fonksiyonumuz.
+private void AttachToPlanet(Transform planetTransform)
     {
         // Hızı sıfırla, fiziği durdur.
         rb.velocity = Vector2.zero;

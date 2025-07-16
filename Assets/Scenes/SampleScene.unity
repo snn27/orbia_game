@@ -254,7 +254,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22, y: 0, z: 0}
+  m_LocalPosition: {x: -22, y: 0, z: -3}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -649,13 +649,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1803269199}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.025740769, w: 0.99966866}
   m_LocalPosition: {x: -22, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 8.26}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 2.95}
 --- !u!114 &1803269203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -676,6 +676,7 @@ MonoBehaviour:
   - {fileID: 3091620869358845551, guid: 970232fe068164e04b949f49e9425622, type: 3}
   defaultColor: {r: 0, g: 1, b: 0, a: 1}
   activeColor: {r: 1, g: 0, b: 0, a: 1}
+  destructionEffectPrefab: {fileID: 186387463177037040, guid: 9c95b622d97c54c509bf5bd8e389490d, type: 3}
 --- !u!212 &48565816786981599
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -798,6 +799,7 @@ MonoBehaviour:
   - {fileID: 3091620869358845551, guid: 970232fe068164e04b949f49e9425622, type: 3}
   defaultColor: {r: 0, g: 1, b: 0, a: 1}
   activeColor: {r: 1, g: 0, b: 0, a: 1}
+  destructionEffectPrefab: {fileID: 186387463177037040, guid: 9c95b622d97c54c509bf5bd8e389490d, type: 3}
 --- !u!1 &8705947656367808260
 GameObject:
   m_ObjectHideFlags: 0
