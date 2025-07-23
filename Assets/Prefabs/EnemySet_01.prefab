@@ -369,7 +369,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7585808251375323021}
-  - component: {fileID: 8808072515039631680}
+  - component: {fileID: -3892031554369301997}
   m_Layer: 0
   m_Name: EnemySet_01
   m_TagString: Untagged
@@ -395,7 +395,7 @@ Transform:
   - {fileID: 3057501627004780831}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8808072515039631680
+--- !u!114 &-3892031554369301997
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -404,7 +404,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 7569370666690127958}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38e294cc05c9d4beaa350b7eea39bd1c, type: 3}
+  m_Script: {fileID: 11500000, guid: 521fb7e16d50840e9a20b83016087175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 120
+  startDelay: 0
+  shouldRotate: 1
+  rotationDuration: 3
+  rotationDirection: 1
+  shouldPulse: 1
+  pulseScale: 1.4
+  pulseDuration: 2

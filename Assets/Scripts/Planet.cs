@@ -12,8 +12,8 @@ public class Planet : MonoBehaviour
 
     private void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null)
+        spriteRenderer = GetComponent<SpriteRenderer>();// rewnk değiştirmek için component'e erişiyor.
+        if (spriteRenderer != null)// companent'erişemezse
         {
             spriteRenderer.color = defaultColor; // Her gezegen yesil baslar.
         }
@@ -22,10 +22,10 @@ public class Planet : MonoBehaviour
     // Bu fonksiyon artik SADECE rengi degistirir.
     public void Activate()
     {
-        if (hasBeenActivated) return;
+        if (hasBeenActivated) return; 
 
-        hasBeenActivated = true;
-        if (spriteRenderer != null)
+        hasBeenActivated = true; 
+        if (spriteRenderer != null) //spriteRenderer erişebilirse demek. renk değiştirmek için 
         {
             spriteRenderer.color = activeColor;
         }

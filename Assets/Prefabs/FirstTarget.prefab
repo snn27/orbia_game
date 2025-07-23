@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 105734200324311320}
   - component: {fileID: 2765051009032303561}
-  - component: {fileID: 342080396631103026}
   - component: {fileID: 1682877529923156936}
   - component: {fileID: 8254214086110866984}
   m_Layer: 0
@@ -87,19 +86,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &342080396631103026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6783080884176600594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38e294cc05c9d4beaa350b7eea39bd1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationSpeed: 400
 --- !u!58 &1682877529923156936
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -147,12 +133,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b041ce6f4bb0d4523bebf56be16e3178, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planetPrefab: {fileID: 6783080884176600594}
-  enemySetPrefabs:
-  - {fileID: 7569370666690127958, guid: f393caef925414663a5cd5f6c35ac24e, type: 3}
-  - {fileID: 2613635735281793286, guid: 8ad42a10d5fbc47b09e2b23eb0390081, type: 3}
-  - {fileID: 6980168288315518415, guid: 30c35d3c41eee45a8b8796e146965e0e, type: 3}
-  - {fileID: 3091620869358845551, guid: 970232fe068164e04b949f49e9425622, type: 3}
   defaultColor: {r: 0, g: 1, b: 0, a: 1}
   activeColor: {r: 1, g: 0, b: 0, a: 1}
-  destructionEffectPrefab: {fileID: 186387463177037040, guid: 9c95b622d97c54c509bf5bd8e389490d, type: 3}
