@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour
         // Dusmana carpma mantigi
         if (other.CompareTag("Guardian"))
         {
-            AudioManager.instance.Play("Death");
+            StartCoroutine(RestartLevelAfterSound()); // Değişiklik burada
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); //enemye carptıgı için game over!
             return;
         }
@@ -190,6 +190,13 @@ public class PlayerController : MonoBehaviour
             // 4. Yeni bir gezegen ve onun etrafinda bir dusman seti olustur.
             SpawnNewPlanetAndEnemies(other.transform);
         }
+    }
+
+    private System.Collections.IEnumerator RestartLevelAfterSound()
+    {
+        AudioManager.instance.Play("Death");
+        yield return new WaitForSeconds(0.5f); // Sesin duyulması için bekle
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void SpawnNewPlanetAndEnemies(Transform originPlanet)

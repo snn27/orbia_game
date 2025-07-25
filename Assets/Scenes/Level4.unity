@@ -653,7 +653,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d75195b49f9eb44b8ab8cfbd8ea8c204, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dashSpeed: 30
+  dashSpeed: 36
   startingPlanet: {fileID: 1121044931}
   initialTarget: {fileID: 1500699457}
   text: {fileID: 1532975747}
@@ -661,10 +661,10 @@ MonoBehaviour:
   guidelinePrefab: {fileID: 3814688463934071318, guid: 7d8d4158907b949c98a8fe0a2393797c, type: 3}
   planetPrefab: {fileID: 6783080884176600594, guid: d806c9f3a68104e599bfec9867a55b43, type: 3}
   enemySetPrefabs:
-  - {fileID: 7569370666690127958, guid: f393caef925414663a5cd5f6c35ac24e, type: 3}
-  - {fileID: 1294528057588081759, guid: 48fc283f9e095479a9a79e365120703e, type: 3}
+  - {fileID: 165149902880905591, guid: 49a150899ad8541d3a195334653fdef0, type: 3}
+  - {fileID: 2613635735281793286, guid: 8ad42a10d5fbc47b09e2b23eb0390081, type: 3}
   - {fileID: 6980168288315518415, guid: 30c35d3c41eee45a8b8796e146965e0e, type: 3}
-  - {fileID: 3091620869358845551, guid: 970232fe068164e04b949f49e9425622, type: 3}
+  - {fileID: 1294528057588081759, guid: 48fc283f9e095479a9a79e365120703e, type: 3}
   - {fileID: 2535882397082342927, guid: 44fa187a4a1c34797bafd74eca7bbdec, type: 3}
   destructionEffectPrefab: {fileID: 186387463177037040, guid: 9c95b622d97c54c509bf5bd8e389490d, type: 3}
 --- !u!1 &7888880008136191767
