@@ -34,6 +34,7 @@ public class DynamicEnemyMovement : MonoBehaviour
         // Eger startDelay 0 ise animasyonlar hemen baslar.
 
         // ROTASYON HAREKETI
+        
         if (shouldRotate)
         {
             // transform.DORotate: Nesnenin rotasyonunu animasyonlu olarak degistirir.
