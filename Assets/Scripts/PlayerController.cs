@@ -5,6 +5,7 @@ using TMPro;
 
 // DOTween'i kod icinden kontrol edebilmek icin bu kutuphaneyi ekliyoruz.
 using DG.Tweening;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
@@ -31,8 +32,17 @@ public class PlayerController : MonoBehaviour
 
     private int score;
     private int nextLevel;
+    private int passLevel = 10;
+    private bool hardMode=false;
+    private int nextLevelInLevel = 10;
 
     private int whatLevel;//level değiştirmek için
+
+    //iki cisim arasında line
+    [Header("Guideline")]
+    [SerializeField] private GameObject guidelinePrefab; // Az önce oluşturduğumuz prefab'ı buraya atayacağız.
+
+    private LineRenderer activeGuideline; // Sahnede aktif olan çizgiyi hafızada tutmak için
 
     // --- Planet ---
     [Header("Core Dependencies")]
@@ -59,7 +69,13 @@ public class PlayerController : MonoBehaviour
 
         score = -1;
 
-        whatLevel = SceneManager.GetActiveScene().buildIndex;
+        whatLevel = SceneManager.GetActiveScene().buildIndex ;
+
+        if (whatLevel >= 3)
+        {
+            nextLevelInLevel = 15;
+           NextLevelTest.text = "Hard Mode Level" ;
+        }
 
     }
 
@@ -71,10 +87,27 @@ public class PlayerController : MonoBehaviour
         {
             Launch();
         }
+
+        // Eğer bekleme modundaysak ve bir yol gösterici çizgimiz varsa...
+        if (currentState == PlayerState.Idle && activeGuideline != null)
+        {
+            // Çizginin başlangıç noktasını oyuncunun pozisyonuna ayarla.
+            activeGuideline.SetPosition(0, transform.position);
+            // Çizginin bitiş noktasını hedefin pozisyonuna ayarla.
+            activeGuideline.SetPosition(1, nextTarget.position);
+        }
     }
 
     private void Launch()
     {
+        // Eğer fare bir UI elementinin üzerindeyse, HİÇBİR ŞEY YAPMA ve fonksiyondan çık.
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return; // Bu satır, aşağıdaki kodların çalışmasını engeller.
+        }
+
+        AudioManager.instance.Play("Launch");
+
         rb.isKinematic = false; // Fiziği aç, çünkü uçuş modunda
         currentState = PlayerState.Dashing; // Durumu "Fırlatıldı" yap
 
@@ -84,6 +117,46 @@ public class PlayerController : MonoBehaviour
         // Hedefe doğru hız ver
         Vector2 direction = (nextTarget.position - transform.position).normalized;
         rb.velocity = direction * dashSpeed;
+
+        if (activeGuideline != null)
+        {
+            // Oyuncunun hedefe varma süresini yaklaşık olarak hesaplayalım.
+            float estimatedTravelTime = Vector2.Distance(transform.position, nextTarget.position) / dashSpeed;
+
+            // Bu süreye göre animasyonu başlatacak coroutine'i çağır.
+            StartCoroutine(AnimateLineDisappearance(activeGuideline, estimatedTravelTime));
+
+            // Animasyon başladığı için artık ana kontrolü bu değişkenden alıyoruz.
+            activeGuideline = null;
+        }
+
+    }
+
+    private System.Collections.IEnumerator AnimateLineDisappearance(LineRenderer line, float duration)
+    {
+        // Çizginin başlangıç ve bitiş noktalarını bir kereliğine kaydedelim.
+        Vector3 startPoint = line.GetPosition(0);
+        Vector3 endPoint = line.GetPosition(1);
+
+        float elapsedTime = 0f;
+
+        // Belirlenen süre boyunca...
+        while (elapsedTime < duration)
+        {
+            // Animasyonun ne kadarının tamamlandığını hesapla (0'dan 1'e).
+            float t = elapsedTime / duration;
+
+            // Çizginin BAŞLANGIÇ noktasını, eski başlangıç noktasından bitiş noktasına doğru hareket ettir.
+            Vector3 newStartPoint = Vector3.Lerp(startPoint, endPoint, t);
+            line.SetPosition(0, newStartPoint);
+
+            // Bir sonraki frame'e geç.
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Süre dolduğunda, çizgi nesnesini tamamen yok et.
+        Destroy(line.gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -91,6 +164,7 @@ public class PlayerController : MonoBehaviour
         // Dusmana carpma mantigi
         if (other.CompareTag("Guardian"))
         {
+            AudioManager.instance.Play("Death");
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); //enemye carptıgı için game over!
             return;
         }
@@ -132,6 +206,18 @@ public class PlayerController : MonoBehaviour
         GameObject newPlanetObject = Instantiate(planetPrefab, spawnPosition, Quaternion.identity);
         nextTarget = newPlanetObject.transform; // Oyuncunun yeni hedefini belirle.
 
+
+        // 1. Önceki çizgiyi (varsa) temizleyelim. Güvenlik önlemi.
+        if (activeGuideline != null)
+        {
+            Destroy(activeGuideline.gameObject);
+        }
+
+        // 2. Yeni yol gösterici çizgiyi sahnede oluştur.
+        GameObject guidelineObject = Instantiate(guidelinePrefab, Vector3.zero, Quaternion.identity);
+        activeGuideline = guidelineObject.GetComponent<LineRenderer>();
+
+
         // 2. O yeni gezegenin etrafinda bir dusman seti olustur.
         if (enemySetPrefabs != null && enemySetPrefabs.Count > 0)
         {
@@ -166,6 +252,14 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
+            if (activeEnemySet != null)
+            {
+                AudioManager.instance.Play("Destroy"); // <-- BU SATIRI EKLE
+
+                DOTween.Kill(activeEnemySet.transform);
+                // ... geri kalan kodlar ...
+            }
+
             // Ve ana dusman seti objesini GUVENLE yok et.
             Destroy(activeEnemySet);
         }
@@ -192,12 +286,17 @@ public class PlayerController : MonoBehaviour
         score += 1;
         text.text = "Score:" + score.ToString();
 
-        nextLevel = 10 - score;
+        nextLevel = nextLevelInLevel - score;
         NextLevelTest.text = "For Next Level:" + nextLevel.ToString();
-        if (score >= 10)
+        if (score >= passLevel )
         {
-
-            //Highscore = score;
+            if (whatLevel>=3 && !hardMode)
+            {
+                passLevel = 15;
+                hardMode = true;
+                return;
+            }
+            //Highscore = score;æç
             whatLevel++;
             SceneManager.LoadScene(whatLevel);
         }

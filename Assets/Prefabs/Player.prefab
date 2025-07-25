@@ -75,7 +75,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 5
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -165,7 +165,8 @@ MonoBehaviour:
   startingPlanet: {fileID: 0}
   initialTarget: {fileID: 0}
   text: {fileID: 0}
-  Hightext: {fileID: 0}
+  NextLevelTest: {fileID: 0}
+  guidelinePrefab: {fileID: 3814688463934071318, guid: 7d8d4158907b949c98a8fe0a2393797c, type: 3}
   planetPrefab: {fileID: 6783080884176600594, guid: d806c9f3a68104e599bfec9867a55b43, type: 3}
   enemySetPrefabs:
   - {fileID: 7569370666690127958, guid: f393caef925414663a5cd5f6c35ac24e, type: 3}
