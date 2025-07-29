@@ -4,7 +4,7 @@ public class CameraFollow : MonoBehaviour
 {
     [Header("Takip Ayarlari")]
     [Tooltip("Kameranin takip edecegi hedef (Player nesnesi)")]
-    [SerializeField] private Transform target;
+    [SerializeField] private PlayerController target;
 
     [Tooltip("Takip yumusakligi. Dusuk degerler kamerayi daha hizli, yuksek degerler daha 'tembel' ve yumusak yapar.")]
     [SerializeField] private float smoothTime = 0.3f;
@@ -29,7 +29,7 @@ public class CameraFollow : MonoBehaviour
         }
 
         // 1. Hedef Pozisyonunu Belirle: Kameranin gitmek ISTEDIGI yer burasidir.
-        Vector3 desiredPosition = target.position + offset;
+        Vector3 desiredPosition = target.followTarget + offset;
 
         // 2. Yumusak Hareketi Uygula: Mevcut kameranin pozisyonunu, hedeflenen pozisyona dogru yumusakca hareket ettir.
         transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref currentVelocity, smoothTime);

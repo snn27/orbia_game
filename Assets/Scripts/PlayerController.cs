@@ -15,8 +15,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashSpeed = 25f;
 
     [Header("Setup")]
-    [SerializeField] private Transform startingPlanet;
-    [SerializeField] private Transform initialTarget;
+    private Transform startingPlanet; 
+    private Transform initialTarget;
 
     // ---  ---
     private Rigidbody2D rb;
@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviour
     private int nextLevelInLevel = 10;
 
     private int whatLevel;//level değiştirmek için
+    
+    public Vector3 followTarget;
 
     //iki cisim arasında line
     [Header("Guideline")]
@@ -52,11 +54,21 @@ public class PlayerController : MonoBehaviour
 
     
     private GameObject activeEnemySet; // Sahnedeki aktif dusman setini hafizada tutacagiz.
+    
+    [Header("Audio")]
+    [SerializeField] private AudioClip launchSound;
+    [SerializeField] private AudioClip destroyEnemiesSound;
+    [SerializeField] private AudioClip deathSound;
+
+     // Sesi çalacak olan bileşenin referansı
+    private AudioSource audioSource;
 
     private void Awake()
     {
+        startingPlanet = FindObjectOfType<StartPlanet>().transform;
+        initialTarget = FindObjectOfType<FirstTarget>().transform;
         rb = GetComponent<Rigidbody2D>();
-
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -72,9 +84,9 @@ public class PlayerController : MonoBehaviour
         whatLevel = SceneManager.GetActiveScene().buildIndex ;
 
         if (whatLevel >= 3)
-        {
+        { 
             nextLevelInLevel = 15;
-           NextLevelTest.text = "Hard Mode Level" ;
+            NextLevelTest.text = "Hard Mode Level" ;
         }
 
     }
@@ -105,9 +117,14 @@ public class PlayerController : MonoBehaviour
         {
             return; // Bu satır, aşağıdaki kodların çalışmasını engeller.
         }
-
-        AudioManager.instance.Play("Launch");
-
+        
+        // Ses klibi atanmışsa, fırlatma sesini çal
+        if (launchSound != null)
+        {
+            Debug.Log("ses çalması lazım");
+            audioSource.PlayOneShot(launchSound);
+        }
+        
         rb.isKinematic = false; // Fiziği aç, çünkü uçuş modunda
         currentState = PlayerState.Dashing; // Durumu "Fırlatıldı" yap
 
@@ -165,15 +182,12 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Guardian"))
         {
             StartCoroutine(RestartLevelAfterSound()); // Değişiklik burada
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); //enemye carptıgı için game over!
             return;
         }
 
         // Sadece firlatilmis durumdaysak ve dogru hedefe carptiysak...
         if (currentState == PlayerState.Dashing && other.transform == nextTarget)
         {
-            // --- YENI MANTIK AKISI ---
-
             // 1. Yeni gezegene kenetlen
             AttachToPlanet(other.transform); // hızını ve kinetigi durdurarak bu işlmei yapmış oluyor
 
@@ -183,26 +197,21 @@ public class PlayerController : MonoBehaviour
             {
                 targetPlanet.Activate();
             }
-
             // 3. Bir onceki (artik aktif olan) dusman setini yok et.
             DestroyPreviousEnemySet();
-
+            
             // 4. Yeni bir gezegen ve onun etrafinda bir dusman seti olustur.
             SpawnNewPlanetAndEnemies(other.transform);
         }
     }
-
-    private System.Collections.IEnumerator RestartLevelAfterSound()
-    {
-        AudioManager.instance.Play("Death");
-        yield return new WaitForSeconds(0.5f); // Sesin duyulması için bekle
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
+    
+    private Vector3 currentTarget;
+    
     private void SpawnNewPlanetAndEnemies(Transform originPlanet)
     {
+        currentTarget = nextTarget.position;
         // 1. Bir sonraki hedef gezegeni olustur
-        float minDistance = 10f, maxDistance = 16f;
+        float minDistance = 14f, maxDistance = 18f;
         float randomAngle = Random.Range(-60f, 90f);
         float randomDistance = Random.Range(minDistance, maxDistance);
 
@@ -213,6 +222,7 @@ public class PlayerController : MonoBehaviour
         GameObject newPlanetObject = Instantiate(planetPrefab, spawnPosition, Quaternion.identity);
         nextTarget = newPlanetObject.transform; // Oyuncunun yeni hedefini belirle.
 
+        followTarget = (currentTarget + nextTarget.position) / 2;
 
         // 1. Önceki çizgiyi (varsa) temizleyelim. Güvenlik önlemi.
         if (activeGuideline != null)
@@ -241,6 +251,12 @@ public class PlayerController : MonoBehaviour
     {
         UpdateScore();
 
+        // Ses klibi atanmışsa, düşmanları yok etme sesini çal
+        if (destroyEnemiesSound != null)
+        {
+            audioSource.PlayOneShot(destroyEnemiesSound);
+        }
+        
         // Eger hafizada yok edilecek bir dusman seti varsa...
         if (activeEnemySet != null)
         {
@@ -261,10 +277,8 @@ public class PlayerController : MonoBehaviour
 
             if (activeEnemySet != null)
             {
-                AudioManager.instance.Play("Destroy"); // <-- BU SATIRI EKLE
 
                 DOTween.Kill(activeEnemySet.transform);
-                // ... geri kalan kodlar ...
             }
 
             // Ve ana dusman seti objesini GUVENLE yok et.
@@ -307,5 +321,21 @@ public class PlayerController : MonoBehaviour
             whatLevel++;
             SceneManager.LoadScene(whatLevel);
         }
+    }
+    
+    private System.Collections.IEnumerator RestartLevelAfterSound()
+    {
+        // Ölüm sesini çal
+        if (deathSound != null)
+        {
+            Debug.Log("ses çalması lazım");
+            audioSource.PlayOneShot(deathSound);
+        }
+
+        // Sesin duyulabilmesi için bekle
+        yield return new WaitForSeconds(0.1f);
+
+        // Sahneyi yeniden yükle
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
