@@ -66,7 +66,7 @@ GameObject:
   - component: {fileID: 278448318000099933}
   m_Layer: 0
   m_Name: DikenliGuardian
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: 2447262226437448121}
   m_Layer: 0
   m_Name: Guardian (3)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

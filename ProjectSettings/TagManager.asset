@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Planet
   - Guardian
+  - GeneratedEnemySet
+  - GeneratedPlanet
   layers:
   - Default
   - TransparentFX

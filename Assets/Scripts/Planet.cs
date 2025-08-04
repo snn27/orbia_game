@@ -10,6 +10,14 @@ public class Planet : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private bool hasBeenActivated = false;
 
+    // Bu script, bir gezegenin o seviyenin başlangıç noktası olduğunu işaretler.
+    public class StartPlanet : MonoBehaviour
+    {
+        [Tooltip("Bu gezegen başlangıç noktasıyken, oyuncunun ilk hedefi olacak gezegen.")]
+        [Header("Seviye Başlangıç Ayarları")]
+        public Transform initialTarget; // HER SEVİYENİN İLK HEDEFİNİ BURAYA ATAYACAĞIZ
+    }
+    
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();// rewnk değiştirmek için component'e erişiyor.

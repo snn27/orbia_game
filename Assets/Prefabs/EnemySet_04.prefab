@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3692581315539731432}
   m_Layer: 0
   m_Name: Guardian (6)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -188,7 +188,7 @@ GameObject:
   - component: {fileID: 2264679301855580097}
   m_Layer: 0
   m_Name: Guardian (5)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -308,7 +308,7 @@ GameObject:
   - component: {fileID: 4026271244923935696}
   m_Layer: 0
   m_Name: DikenliGuardian (3)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -438,7 +438,7 @@ GameObject:
   - component: {fileID: 7011742911864304887}
   m_Layer: 0
   m_Name: DikenliGuardian (2)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

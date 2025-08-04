@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4297315248014066546}
   m_Layer: 0
   m_Name: Guardian (7)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 6630487129066666927}
   m_Layer: 0
   m_Name: Guardian (4)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 506538188912496370}
   m_Layer: 0
   m_Name: Guardian (5)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -433,7 +433,7 @@ GameObject:
   - component: {fileID: 1167094740222738465}
   m_Layer: 0
   m_Name: Guardian (10)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -553,7 +553,7 @@ GameObject:
   - component: {fileID: 6747064497959864466}
   m_Layer: 0
   m_Name: Guardian (8)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -673,7 +673,7 @@ GameObject:
   - component: {fileID: 1335407014747729126}
   m_Layer: 0
   m_Name: DikenliGuardian (2)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -803,7 +803,7 @@ GameObject:
   - component: {fileID: 5393004189535917969}
   m_Layer: 0
   m_Name: Guardian (6)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -923,7 +923,7 @@ GameObject:
   - component: {fileID: 6026647182324699036}
   m_Layer: 0
   m_Name: DikenliGuardian (3)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1053,7 +1053,7 @@ GameObject:
   - component: {fileID: 2436513857640854766}
   m_Layer: 0
   m_Name: Guardian (9)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

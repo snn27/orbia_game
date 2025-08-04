@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5287540785314052638}
   m_Layer: 0
   m_Name: Guardian (2)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 3311466301075378413}
   m_Layer: 0
   m_Name: Guardian (1)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -253,7 +253,7 @@ GameObject:
   - component: {fileID: 4858117057300712100}
   m_Layer: 0
   m_Name: Guardian
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

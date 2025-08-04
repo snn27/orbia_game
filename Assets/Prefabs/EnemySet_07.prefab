@@ -69,7 +69,7 @@ GameObject:
   - component: {fileID: 539955988932997009}
   m_Layer: 0
   m_Name: Guardian (10)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 1609483317332464085}
   m_Layer: 0
   m_Name: Guardian (5)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 8915192994621296254}
   m_Layer: 0
   m_Name: Guardian (4)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -429,7 +429,7 @@ GameObject:
   - component: {fileID: 6669250534920757300}
   m_Layer: 0
   m_Name: Guardian (6)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -549,7 +549,7 @@ GameObject:
   - component: {fileID: 3855756400015970738}
   m_Layer: 0
   m_Name: Guardian (9)
-  m_TagString: Guardian
+  m_TagString: GeneratedEnemySet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
