@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b539221e01ce44572bb110c71ad92b32, type: 3}
+  m_Name: Seviye_1
+  m_EditorClassIdentifier: 
+  oyuncuHizi: 25
+  hedefeUlasmaSayisi: 2
+  kullanilacakDusmanSetleri:
+  - {fileID: 7569370666690127958, guid: f393caef925414663a5cd5f6c35ac24e, type: 3}
+  - {fileID: 2613635735281793286, guid: 8ad42a10d5fbc47b09e2b23eb0390081, type: 3}
+  - {fileID: 6980168288315518415, guid: 30c35d3c41eee45a8b8796e146965e0e, type: 3}
+  - {fileID: 3091620869358845551, guid: 970232fe068164e04b949f49e9425622, type: 3}
+  - {fileID: 5301423799196809989, guid: 4cb901da20ea24a98982351a185c5245, type: 3}
+  planetPrefab: {fileID: 9157561563983736627, guid: 421cf849319ff49e7a346dd75aae4d65, type: 3}
+  minSpawnMesafe: 10
+  maxSpawnMesafe: 16
