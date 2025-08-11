@@ -5,86 +5,78 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    // [Header("1. OYUN İÇİ ARAYÜZ")]
+    // --- CANVAS & PANEL REFERANSLARI ---
+    [Header("Panels & Canvases")]
     [SerializeField] private GameObject scoreCanvas;
+    [SerializeField] private GameObject pausePanel;
+    [SerializeField] private GameObject winPanel;
+
+    // --- TEXT REFERANSLARI ---
+    [Header("Text Elements")]
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI nextLevelText;
-    [SerializeField] private TextMeshProUGUI levelText; // Önceden "kazanma" panelindeydi, buraya daha uygun
-
-    // [Header("2. DURAKLATMA PANELİ")]
-    [SerializeField] private GameObject pausePanel; // Hiyerarşideki 'MenuCanvas' olabilir.
-
-    // [Header("3. KAZANMA PANELİ")]
-    [SerializeField] private GameObject winPanel;
+    [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI winText;
     
-    // --- BUTON REFERANSLARI (İsimler hiyerarşiye uygun hale getirildi) ---
+    // --- BUTON REFERANSLARI ---
     [Header("Buttons")]
-    [SerializeField] private Button pauseMenuButton;    // Sahnedeki üç çizgili buton
-    [SerializeField] private Button playButton;         // Pause Panel -> PlayButton
-    [SerializeField] private Button repeatButton;       // Pause Panel -> RepeatButton
-    [SerializeField] private Button baseButton_Pause;   // Pause Panel -> BaseButton
-    
-    [SerializeField] private Button nextLevelButton;    // Win Panel -> NextLevelButton
-    [SerializeField] private Button baseButton_Win;     // Win Panel -> BaseButton
+    [SerializeField] private Button pauseMenuButton;
+    [SerializeField] private Button playButton;
+    [SerializeField] private Button repeatButton;
+    [SerializeField] private Button baseButton_Pause;
+    [SerializeField] private Button nextLevelButton;
+    [SerializeField] private Button baseButton_Win;
 
     private void Awake()
     {
-        if (pauseMenuButton != null)
-            pauseMenuButton.onClick.AddListener(OnOpenPausePanelPressed);
-
-        // PAUSE PANELİ BUTONLARI
-        if (playButton != null)
-            playButton.onClick.AddListener(OnContinuePressed);
-
-        if (repeatButton != null)
-            repeatButton.onClick.AddListener(OnRestartPressed);
-            
-        if (baseButton_Pause != null)
-            baseButton_Pause.onClick.AddListener(OnMainMenuPressed);
-            
-        // WIN PANELİ BUTONLARI
-        if (nextLevelButton != null)
-            nextLevelButton.onClick.AddListener(OnNextLevelPressed);
-            
-        if (baseButton_Win != null)
-            baseButton_Win.onClick.AddListener(OnMainMenuPressed); // Bu da Ana Menü'ye döner
+        // Butonların olay dinleyicilerini (listeners) kod üzerinden atamak en güvenli yoldur.
+        // Bu, Inspector'daki olası hataları ve unutkanlıkları engeller.
+        if (pauseMenuButton != null) pauseMenuButton.onClick.AddListener(OnOpenPausePanelPressed);
+        if (playButton != null) playButton.onClick.AddListener(OnContinuePressed);
+        if (repeatButton != null) repeatButton.onClick.AddListener(OnRestartPressed);
+        if (baseButton_Pause != null) baseButton_Pause.onClick.AddListener(OnMainMenuPressed);
+        if (nextLevelButton != null) nextLevelButton.onClick.AddListener(OnNextLevelPressed);
+        if (baseButton_Win != null) baseButton_Win.onClick.AddListener(OnMainMenuPressed);
     }
+    
+    // --- OLAY YÖNETİMİ ---
     private void OnEnable()
     {
+        // GameManager'dan gelen bilgilendirme olaylarını dinle
         EventManager.OnScoreUpdated += HandleScoreUpdated;
         EventManager.OnLevelDisplayUpdated += HandleLevelDisplayUpdated;
         EventManager.OnLevelWon += HandleLevelWon;
-    
-        // Ana menüye dönüldüğünde veya seviye yeniden başladığında panelleri resetlemek için.
-        EventManager.OnGoToMainMenu += ResetPanelsToDefault;
-        EventManager.OnRestartLevel += ResetPanelsToDefault_Event; // Yeni bir handler ekliyoruz
+        
+        // Seviye başladığında panelleri sıfırla
+        EventManager.OnLevelStart += HandleLevelStart;
     }
 
     private void OnDisable()
     {
+        // Obje yok edildiğinde veya pasif olduğunda dinlemeyi bırakmayı ASLA unutma!
         EventManager.OnScoreUpdated -= HandleScoreUpdated;
         EventManager.OnLevelDisplayUpdated -= HandleLevelDisplayUpdated;
         EventManager.OnLevelWon -= HandleLevelWon;
-        EventManager.OnGoToMainMenu -= ResetPanelsToDefault;
-        EventManager.OnRestartLevel -= ResetPanelsToDefault_Event;
+        EventManager.OnLevelStart -= HandleLevelStart;
     }
 
-    private void Start()
+    // --- OLAY İŞLEYİCİLERİ (EVENT HANDLERS) ---
+    private void HandleLevelStart(LevelDataSo levelData, Transform startPoint)
     {
+        // Seviye başladığında UIManager'ın yapması gereken tek şey, arayüzü varsayılan haline getirmektir.
         ResetPanelsToDefault();
     }
     
-    // --- OLAY İŞLEYİCİLERİ (EVENT HANDLERS) ---
-    // GameManager "Skor Güncellendi" dediğinde burası otomatik çalışır.
     private void HandleScoreUpdated(int newScore, int targetScore)
     {
-        scoreText.text = "Score: " + newScore.ToString();
-        int remaining = Mathf.Max(0, targetScore - newScore);
-        nextLevelText.text = "For Next Level: " + remaining.ToString();
+        if(scoreText != null) scoreText.text = "Score: " + newScore.ToString();
+        if(nextLevelText != null) 
+        {
+            int remaining = Mathf.Max(0, targetScore - newScore);
+            nextLevelText.text = "For Next Level: " + remaining.ToString();
+        }
     }
     
-    // GameManager "Seviye Yazısı Güncellendi" dediğinde burası otomatik çalışır.
     private void HandleLevelDisplayUpdated(int levelNumber)
     {
         if (levelText != null)
@@ -93,65 +85,59 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    // GameManager "Seviye Kazanıldı" dediğinde burası otomatik çalışır.
-    private void HandleLevelWon() {
-        scoreCanvas.SetActive(false);
-        winPanel.SetActive(true);
+    private void HandleLevelWon() 
+    {
+        if(scoreCanvas != null) scoreCanvas.SetActive(false);
+        if(winPanel != null) winPanel.SetActive(true);
         if(winText != null) winText.text = "LEVEL COMPLETE!";
     }
     
-    public void OnOpenPausePanelPressed()
+    // --- BUTONLARA BAĞLI METOTLAR ---
+    // Bu metotların görevi, ya arayüzü anında değiştirmek ya da GameManager'ın dinlediği bir isteği göndermektir.
+    
+    private void OnOpenPausePanelPressed()
     {
-        // Bu panel yönetimi artık UIManager'ın kendi sorumluluğunda.
-        // GameManager'a sormasına gerek yok.
-        pausePanel.SetActive(true);
-        Time.timeScale = 0f; // Oyunun zamanını durdurmak önemli.
+        if (GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
+        if(pausePanel != null) pausePanel.SetActive(true);
+        Time.timeScale = 0f;
     }
     
-    public void OnContinuePressed()
+    private void OnContinuePressed()
     {
-        pausePanel.SetActive(false);
-        Time.timeScale = 1f; // Zamanı tekrar başlat.
-    }
-    
-    public void OnRestartPressed()
-    {
-        // Bu buton bir anons yapar. GameManager bu anonsu duyup seviyeyi yeniden başlatır.
-        Time.timeScale = 1f; // Zamanı başlatmayı unutma!
-        EventManager.TriggerRestartLevel();
-    }
-    
-    public void OnMainMenuPressed()
-    {
-        // Bu buton da bir anons yapar.
+        if(pausePanel != null) pausePanel.SetActive(false);
         Time.timeScale = 1f;
-        EventManager.TriggerGoToMainMenu();
+    }
+    
+    private void OnRestartPressed()
+    {
+        Time.timeScale = 1f;
+        // GameManager'a "Yeniden Başlatma İsteği" gönderiyoruz.
+        EventManager.TriggerRestartLevelRequest();
+    }
+    
+    private void OnMainMenuPressed()
+    {
+        Time.timeScale = 1f;
+        // GameManager'a "Ana Menüye Dönme İsteği" gönderiyoruz.
+        EventManager.TriggerGoToMainMenuRequest();
     }
     
     public void OnNextLevelPressed()
     {
-        ResetPanelsToDefault();
-
-        // <<< 2. ADIM: SONRA GÖREVİ GAMEMANAGER'A DEVRET >>>
-        // Zamanı tekrar başlat.
         Time.timeScale = 1f;
-
-        // GameManager'a yeni seviyeyi başlatması için sinyal gönder.
-        if(GameManager.Instance != null)
+        // Bu doğrudan GameManager'ı çağırabilir, çünkü oyun akışıyla ilgili çok spesifik bir komuttur
+        // ve sadece GameManager'ın nasıl yapılacağını bildiği bir iştir.
+        if (GameManager.Instance != null)
         {
             GameManager.Instance.StartNextLevel();
         }
     }
-    private void ResetPanelsToDefault_Event()
-    {
-        // Bu metot, sadece event tarafından tetiklendiğinde çalışır
-        ResetPanelsToDefault();
-    }
+
+    // --- YARDIMCI METOT ---
     private void ResetPanelsToDefault()
     {
-        scoreCanvas.SetActive(true);
-        pausePanel.SetActive(false);
-        winPanel.SetActive(false);
-        Debug.Log("<color=yellow>UIManager:</color> Paneller resetlendi.");
+        if(scoreCanvas != null) scoreCanvas.SetActive(true);
+        if(pausePanel != null) pausePanel.SetActive(false);
+        if(winPanel != null) winPanel.SetActive(false);
     }
 }

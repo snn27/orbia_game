@@ -1,161 +1,137 @@
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     public enum GameState { Playing, Paused, LevelComplete }
-    public GameState CurrentState { get; private set; } // diger scripler değiştiremez
-    
-    [FormerlySerializedAs("levelsData")] [Header("Level Settings")]
+    public GameState CurrentState { get; private set; }
+
+    [Header("Level Settings")]
     public LevelsDataSo levelsDataSo;
     public int currentLevelIndex = 0;
     
-    [Header("Game State Variables")]
+    [Header("Scene References")]
+    [Tooltip("Oyuncunun ve seviyelerin başlayacağı sabit başlangıç noktası.")]
+    [SerializeField] private PlayerController playerController;
+    [SerializeField] private Transform initialStartTransform; 
+
     private int currentScore = 0;
     private int targetScore;
-    
-    [SerializeField] private Transform initialStartTransform; 
-    // GameManager'ın tekil (singleton) örneğini yönetir. Birden fazla kopyayı engeller.
+
     private void Awake() {
-        if (Instance == null) { Instance = this; }
+        if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
         else { Destroy(gameObject); }
     }
     
     private void OnEnable()
     {
+        // Oyun içindeki olayları dinle
         EventManager.OnPlanetReached += HandlePlanetReached;
         EventManager.OnPlayerDied += HandlePlayerDied;
-        EventManager.OnRestartLevel += RestartCurrentLevel;
-        EventManager.OnGoToMainMenu += ReturnToMainMenu;
-        // Kendi iç yönetimi için NextLevel'ı da buradan tetikleyebilir
+        
+        // UI'dan gelen istekleri dinle
+        EventManager.OnRestartLevelRequest += RestartCurrentLevel;
+        EventManager.OnGoToMainMenuRequest += GoToMainMenu;
     }
 
     private void OnDisable()
     {
         EventManager.OnPlanetReached -= HandlePlanetReached;
         EventManager.OnPlayerDied -= HandlePlayerDied;
-        EventManager.OnRestartLevel -= RestartCurrentLevel;
-        EventManager.OnGoToMainMenu -= ReturnToMainMenu;
+        EventManager.OnRestartLevelRequest -= RestartCurrentLevel;
+        EventManager.OnGoToMainMenuRequest -= GoToMainMenu;
     }
     
     private void Start()
     {
+        // Oyunu en baştan, temiz bir oturumla başlat.
         StartNewGameSession();
     }
-    
-    private void StartNewGameSession() {
-        CurrentState = GameState.Playing;
-        StartLevel(levelsDataSo.levels[currentLevelIndex]);
+
+    public void StartNewGameSession() {
+        StartLevel(currentLevelIndex); 
     }
     
-    // Her yeni seviye kurulduğunda bu ana metot çalışır, başlangıçta currentLevelIndex o oldugundan 1 level gelir..
-    private void StartLevel(LevelDataSo levelDataSo)
-    {
-        if (levelDataSo == null)
-        {
-            Debug.LogError("[GameManager] HATA: StartLevel metoduna gelen 'levelData' NULL! Inspector'da 'All Levels' dizisini kontrol edin!");
-            return; // Fonksiyonun devam etmesini engelle
+    public void StartNextLevel() {
+        if (CurrentState != GameState.LevelComplete) return;
+        int nextIndex = currentLevelIndex + 1;
+        if (nextIndex >= levelsDataSo.levels.Count) {
+            Debug.Log("TEBRIKLER! Tum seviyeleri bitirdin! Başa dönülüyor.");
+            nextIndex = 0;
         }
-        Debug.Log("[GameManager] StartLevel çağrıldı. Gelen LevelData: " + levelDataSo.name);
-        
-        ClearPreviousLevel();
-        
-        LevelDataSo levelData = levelsDataSo.levels[currentLevelIndex];
-        CurrentState = GameState.Playing;
-        Time.timeScale = 1f;
+        StartLevel(nextIndex);
+    }
 
-        targetScore = levelData.hedefeUlasmaSayisi;
-        currentScore = 0;
+    private void RestartCurrentLevel() {
+        StartLevel(currentLevelIndex); // O anki seviyeyi yeniden başlat.
+    }
+    
+    private void GoToMainMenu() {
+        StartNewGameSession(); // Ana menüye dönmek, yeni bir oyun başlatmaktır.
+    }
+
+    // --- EN ÖNEMLİ ANA FONKSİYON: SEVİYE KURULUMU ---
+    private void StartLevel(int levelIndex)
+    {
+        // 1. ÖNCEKİ SEVİYEDEN KALAN TÜM DİNAMİK OBJELERİ TEMİZLE
+        ClearSceneObjects();
         
-        // 3. ADIM: ANONSU GEÇ
-        // PlayerController, UIManager gibi mevcut aboneler bu anonsu duyacak ve kurulumlarını yapacak.
-        EventManager.TriggerLevelStart(levelsDataSo.levels[currentLevelIndex], initialStartTransform.transform);
+        // 2. YENİ SEVİYE DEĞİŞKENLERİNİ AYARLA
+        currentLevelIndex = levelIndex;
+        LevelDataSo levelData = levelsDataSo.levels[currentLevelIndex];
+
+        if (levelData == null) {
+            Debug.LogError($"HATA: LevelsDataSo içinde {levelIndex}. eleman (seviye) için veri bulunamadı!");
+            return;
+        }
+        
+        if (playerController != null)
+        {
+            playerController.ResetPlayer(initialStartTransform);
+        }
+        else
+        {
+            Debug.LogError("GameManager'da PlayerController referansı atanmamış!");
+            return;
+        }
+        
+        playerController.SetupFirstTarget(levelData);
+
+        // ADIM 3: OYUN DURUMUNU VE UI'ı GÜNCELLEMESİ İÇİN ANONS GEÇ
         EventManager.TriggerScoreUpdated(currentScore, targetScore);
         EventManager.TriggerLevelDisplayUpdated(currentLevelIndex + 1);
+        
     }
     
-    private void HandlePlanetReached()
-    {
+    // --- OLAY İŞLEYİCİLERİ ---
+    private void HandlePlanetReached() {
         if (CurrentState != GameState.Playing) return;
         currentScore++;
         EventManager.TriggerScoreUpdated(currentScore, targetScore);
 
-        if (currentScore >= targetScore)
-        {
+        if (currentScore >= targetScore) {
             CurrentState = GameState.LevelComplete;
             Time.timeScale = 0f;
             EventManager.TriggerLevelWon();
         }
     }
     
-    private void HandlePlayerDied()
-    {
+    private void HandlePlayerDied() {
         if (CurrentState != GameState.Playing) return;
-        CurrentState = GameState.LevelComplete; 
-        Invoke(nameof(RestartCurrentLevel), 0.2f); 
+        CurrentState = GameState.LevelComplete;
+        Invoke(nameof(RestartCurrentLevel), 0.4f); // 1.5 saniye sonra seviyeyi yeniden başlat
     }
     
-    public void StartNextLevel()
-    {
-        //state koruması yapılır 
-        if (CurrentState != GameState.LevelComplete) return;
-
-        // Kilit: level  basladigi an durumu degistirerek ikinci bir cagriyi engeller.
-        CurrentState = GameState.Playing; 
+    // --- TEMİZLİK FONKSİYONU ---
+    private void ClearSceneObjects() {
+        Debug.Log("<color=red>Sahne temizleniyor...</color>");
         
-        Debug.Log($"<color=green>[GameManager]</color> StartNextLevel ÇAĞRILDI! Yeni seviyeye geçiliyor...");
-        
-        Time.timeScale = 1f;
-        currentLevelIndex++;
-        if (currentLevelIndex >= levelsDataSo.levels.Count)
-        {
-            Debug.Log("TEBRIKLER! Tum seviyeleri bitirdin! Başa dönülüyor.");
-            currentLevelIndex = 0;
-        }
-        EventManager.ClearAllEvents();
-
-        StartLevel(levelsDataSo.levels[currentLevelIndex]);
-    }
-    
-    public void RestartCurrentLevel()
-    {
-        StartLevel(levelsDataSo.levels[currentLevelIndex]);
-    }
-
-    public void ReturnToMainMenu()
-    {
-        EventManager.ClearAllEvents();
-        currentLevelIndex=0;
-        StartNewGameSession();
-    }
-    
-    public void PauseGame() 
-    {
-        if (CurrentState != GameState.Playing) return;
-        CurrentState = GameState.Paused;
-        Time.timeScale = 0f;
-    }
-
-    public void ResumeGame()
-    {
-        if (CurrentState != GameState.Paused) return;
-        CurrentState = GameState.Playing;
-        Time.timeScale = 1f;
-    }
-    
-    //--- Yardımcı Fonksiyon ---
-    private void ClearPreviousLevel()
-    {
         DOTween.KillAll();
-        CancelInvoke();
-        
-        // Sonra olay listelerini temizle ki eski objeler yeni anonsları duymasın.
-        EventManager.ClearAllEvents();
+        CancelInvoke(); // Zamanlanmış tüm Invoke'ları iptal et (örneğin oyuncu ölür ölmez restart'a basarsa)
 
-        // Sahnedeki tüm dinamik objeleri yok et.
+        // SADECE DİNAMİK OLARAK OLUŞTURULAN VE ETİKETLENEN OBJELERİ YOK ET
         GameObject[] allPlanets = GameObject.FindGameObjectsWithTag("GeneratedPlanet");
         foreach (GameObject planet in allPlanets) Destroy(planet);
         
@@ -165,9 +141,7 @@ public class GameManager : MonoBehaviour
         LineRenderer[] allLines = FindObjectsOfType<LineRenderer>();
         foreach (LineRenderer line in allLines) Destroy(line.gameObject);
 
-        // UIManager'a kendini resetlemesi için anons geç.
-        EventManager.TriggerGoToMainMenu(); // ResetPanelsToDefault'u tetikler.
-
-        Debug.Log("<color=red>Tüm sahne ve eventler yeni seviye için temizlendi.</color>");
+        // PlayerController kendini OnLevelStart'ta zaten resetleyecek.
+        // UIManager da kendi panellerini OnLevelStart veya diğer eventlerde yönetecek.
     }
 }
