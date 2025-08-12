@@ -29,8 +29,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip deathSound;
     
     // --- OLAY YÖNETİMİ ---
-    private void OnEnable() { EventManager.OnLevelStart += HandleLevelStart; }
-    private void OnDisable() { EventManager.OnLevelStart -= HandleLevelStart; }
+    // private void OnEnable() { EventManager.OnLevelStart += HandleLevelStart; }
+    // private void OnDisable() { EventManager.OnLevelStart -= HandleLevelStart; }
     
     private void Awake()
     {
@@ -84,21 +84,18 @@ public class PlayerController : MonoBehaviour
     // --- İÇ (PRIVATE) YARDIMCI METOTLAR ---
     public void ResetPlayer(Transform startPlanet)
     {
-        // <<< 1. YENİDEN KULLANIM İÇİN AKTİF HALE GETİR >>>
-        // Eğer oyuncu ölüp pasif hale geldiyse, onu tekrar görünür yap.
-        gameObject.SetActive(true);
-    
+        gameObject.SetActive(true); // Her ihtimale karşı aktif olduğundan emin ol
         transform.position = startPlanet.position;
         StopAllCoroutines();
-    
-        // Tüm iç durumu sıfırla
+
+        // Tüm iç durumu (hedef, çizgi vb.) temizle
         if (activeGuideline != null) Destroy(activeGuideline.gameObject);
         activeGuideline = null;
         nextTarget = null;
-        if(activeEnemySet != null) Destroy(activeEnemySet);
+        if (activeEnemySet != null) Destroy(activeEnemySet);
         activeEnemySet = null;
 
-        // Oyuncuyu gezegene fiziksel olarak bağla ve durumunu 'Idle' yap
+        // Oyuncuyu gezegene fiziksel olarak bağla ve bekleme durumuna al
         AttachToPlanet(startPlanet);
     }
     
@@ -132,13 +129,10 @@ public class PlayerController : MonoBehaviour
     private void HandleDeath()
     {
         if (deathSound != null) audioSource.PlayOneShot(deathSound);
-    
-        // <<< 2. ARTIK OYUNCUYU YOK ETMİYORUZ >>>
-        // Sadece GameObject'i sahnede pasif (görünmez ve etkileşimsiz) hale getiriyoruz.
-        // Bu, referansların kopmasını engeller.
-        //gameObject.SetActive(false); 
-    
-        // Raporu merkeze (GameManager'a) iletiyoruz.
+        // rb.velocity = Vector2.zero;
+        // rb.isKinematic = true;
+
+        // Durumu GameManager'a bildir.
         EventManager.TriggerPlayerDied();
     }
     
@@ -229,4 +223,25 @@ public class PlayerController : MonoBehaviour
         dashSpeed = _currentLevelDataSo.dashSpeed_inLevelData;
         SpawnNewPlanetAndEnemies(transform); // Artık başlangıç noktası kendi transformu
     }
+    
+    public void SetupLevel(LevelDataSo levelData)
+    {
+        Debug.Log($"<color=cyan>PlayerController:</color> GameManager'dan kurulum verileri alındı: '{levelData.name}'");
+        _currentLevelDataSo = levelData;
+        dashSpeed = _currentLevelDataSo.dashSpeed_inLevelData;
+    }
+
+    public void CreateFirstPlanetAndEnemies(Transform originPoint)
+    {
+        // İlk gezegeni ve düşmanı oluşturur.
+        SpawnNewPlanetAndEnemies(originPoint);
+    }
+    
+    public void SetTemporaryTarget(Transform temporaryTarget)
+    {
+        // Bu, kameranın ve nişan çizgisinin, asıl hedef yaratılmadan önce
+        // geçici bir noktaya odaklanmasını sağlar.
+        nextTarget = temporaryTarget;
+    }
+    
 }

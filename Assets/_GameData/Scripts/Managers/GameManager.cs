@@ -75,36 +75,51 @@ public class GameManager : MonoBehaviour
     // --- EN ÖNEMLİ ANA FONKSİYON: SEVİYE KURULUMU ---
     private void StartLevel(int levelIndex)
     {
-        // 1. ÖNCEKİ SEVİYEDEN KALAN TÜM DİNAMİK OBJELERİ TEMİZLE
+        // Adım 1: Önceki seviyeden kalan tüm dinamik objeleri temizle
         ClearSceneObjects();
-        
-        // 2. YENİ SEVİYE DEĞİŞKENLERİNİ AYARLA
+    
+        // Adım 2: Yeni seviye için gerekli verileri ve durumu ayarla
         currentLevelIndex = levelIndex;
         LevelDataSo levelData = levelsDataSo.levels[currentLevelIndex];
 
+        // Güvenlik kontrolleri
         if (levelData == null) {
             Debug.LogError($"HATA: LevelsDataSo içinde {levelIndex}. eleman (seviye) için veri bulunamadı!");
             return;
         }
-        
-        if (playerController != null)
-        {
-            playerController.ResetPlayer(initialStartTransform);
-        }
-        else
-        {
+        if (playerController == null) {
             Debug.LogError("GameManager'da PlayerController referansı atanmamış!");
             return;
         }
-        
-        playerController.SetupFirstTarget(levelData);
+    
+        // Adım 3: Oyun durumunu ve temel değişkenleri ayarla
+        CurrentState = GameState.Playing;
+        Time.timeScale = 1f;
+        targetScore = levelData.hedefeUlasmaSayisi;
+        currentScore = 0;
+    
+        Debug.Log($"<color=green>--- SEVİYE {levelIndex + 1} BAŞLATILIYOR: {levelData.name} ---</color>");
 
-        // ADIM 3: OYUN DURUMUNU VE UI'ı GÜNCELLEMESİ İÇİN ANONS GEÇ
+        // Adım 4: DOĞRUDAN KOMUTLARLA OYUNCUYU KURMA SÜRECİ
+    
+        // 4a: Oyuncuyu başlangıç noktasına resetle ve hayata döndür.
+        playerController.ResetPlayer(initialStartTransform);
+
+        // 4b: Kameranın boşluğa düşmemesi için ona anında geçici bir hedef ver.
+        // Bu, oyuncu ve hedef arasındaki ani boşluğu doldurur.
+        playerController.SetTemporaryTarget(initialStartTransform);
+
+        // 4c: Seviye verilerini yüklemesini ve asıl ilk hedefi oluşturmasını söyle.
+        // Bu metodun içindeki SpawnNewPlanetAndEnemies, SetNextTarget'ı çağırarak 4b'deki
+        // geçici hedefi anında doğru olanla günceller.
+        playerController.SetupLevel(levelData);
+        playerController.CreateFirstPlanetAndEnemies(initialStartTransform);
+    
+        // Adım 5: Gerekli UI güncellemeleri için genel anonsları geç.
         EventManager.TriggerScoreUpdated(currentScore, targetScore);
         EventManager.TriggerLevelDisplayUpdated(currentLevelIndex + 1);
-        
     }
-    
+
     // --- OLAY İŞLEYİCİLERİ ---
     private void HandlePlanetReached() {
         if (CurrentState != GameState.Playing) return;
@@ -125,23 +140,20 @@ public class GameManager : MonoBehaviour
     }
     
     // --- TEMİZLİK FONKSİYONU ---
-    private void ClearSceneObjects() {
-        Debug.Log("<color=red>Sahne temizleniyor...</color>");
-        
+    private void ClearSceneObjects()
+    {
         DOTween.KillAll();
-        CancelInvoke(); // Zamanlanmış tüm Invoke'ları iptal et (örneğin oyuncu ölür ölmez restart'a basarsa)
-
-        // SADECE DİNAMİK OLARAK OLUŞTURULAN VE ETİKETLENEN OBJELERİ YOK ET
+        CancelInvoke();
+    
         GameObject[] allPlanets = GameObject.FindGameObjectsWithTag("GeneratedPlanet");
         foreach (GameObject planet in allPlanets) Destroy(planet);
-        
+    
         GameObject[] allEnemies = GameObject.FindGameObjectsWithTag("GeneratedEnemySet");
         foreach (GameObject enemy in allEnemies) Destroy(enemy);
 
         LineRenderer[] allLines = FindObjectsOfType<LineRenderer>();
         foreach (LineRenderer line in allLines) Destroy(line.gameObject);
 
-        // PlayerController kendini OnLevelStart'ta zaten resetleyecek.
-        // UIManager da kendi panellerini OnLevelStart veya diğer eventlerde yönetecek.
+        Debug.Log("<color=red>Dinamik sahne objeleri temizlendi.</color>");
     }
 }

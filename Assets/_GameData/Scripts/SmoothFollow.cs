@@ -36,25 +36,35 @@ public class CameraFollow : MonoBehaviour
     // --- YAŞAM DÖNGÜSÜ ---
     private void LateUpdate()
     {
-        // Güvenlik koşulumuz aynı.
-        if (!_canFollow || target == null || !target.gameObject.activeInHierarchy)
+        // Hedefimiz yoksa veya pasifse hiçbir şey yapma.
+        if (target == null || !target.gameObject.activeInHierarchy)
         {
             return;
         }
-
+        
         Vector3 desiredPosition;
         
-        // Bu takip mantığı doğru ve aynı kalabilir.
         if (target.NextTarget != null)
         {
+            // --- Normal Takip Modu ---
+            // Oyuncu ve hedefinin tam orta noktasini hesapla.
             Vector3 midpoint = (target.transform.position + target.NextTarget.position) / 2f;
             desiredPosition = midpoint + offset;
         }
         else
         {
+            // --- HEDEFİN KAYBOLDUĞU AN (Geçiş veya Ölüm) ---
+            // Panik yapıp oyuncuya yapışma! Bunun yerine, sadece oyuncunun
+            // mevcut pozisyonunu takip et. Bu, kamera zıplamasını engeller.
             desiredPosition = target.transform.position + offset;
+            
+            // Daha da iyisi, kamerayı mevcut pozisyonunda tutabiliriz.
+            // Ama bu, oyuncu başlangıç noktasına ışınlandığında kameranın
+            // anında atlamasına neden olabilir. Bu yüzden yavaşça oyuncuya
+            // doğru kayması daha iyi.
         }
 
+        // Hesaplanan 'desiredPosition'a dogru kamerayi yumusakca hareket ettir.
         transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref _currentVelocity, smoothTime);
     }
     
@@ -72,4 +82,6 @@ public class CameraFollow : MonoBehaviour
         Debug.Log("<color=purple>CameraFollow:</color> Seviye başlangıç anonsunu duydum, takibi yeniden başlatıyorum.");
         _canFollow = true;
     }
+    
+    
 }
