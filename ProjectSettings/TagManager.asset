@@ -8,6 +8,7 @@ TagManager:
   - Guardian
   - GeneratedEnemySet
   - GeneratedPlanet
+  - Puan
   layers:
   - Default
   - TransparentFX

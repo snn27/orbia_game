@@ -139,6 +139,20 @@ public class GameManager : MonoBehaviour
         Invoke(nameof(RestartCurrentLevel), 0.4f); // 1.5 saniye sonra seviyeyi yeniden başlat
     }
     
+    public void AddBonusScore(int amount)
+    {
+        // Oyunun oynanır durumda olduğundan emin ol.
+        if (CurrentState != GameState.Playing) return;
+
+        Debug.Log($"<color=yellow>BONUS:</color> {amount} puan eklendi!");
+        
+        
+        // currentScore += amount;
+        
+        // Puan değiştiği için, UI'ın güncellenmesi gerektiğini herkese bildir.
+        // EventManager.TriggerScoreUpdated(currentScore, targetScore);
+    }
+    
     // --- TEMİZLİK FONKSİYONU ---
     private void ClearSceneObjects()
     {

@@ -28,9 +28,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip destroyEnemiesSound;
     [SerializeField] private AudioClip deathSound;
     
-    // --- OLAY YÖNETİMİ ---
-    // private void OnEnable() { EventManager.OnLevelStart += HandleLevelStart; }
-    // private void OnDisable() { EventManager.OnLevelStart -= HandleLevelStart; }
+    private bool _hasBonusPointChance = false; 
+    [Header("Bonus Point Assets")] //[SerializeField] private AudioClip bonusPointSound;
+    [SerializeField] private GameObject bonusPointEffectPrefab;
+    [SerializeField] private int bonusScoreValue = 5;
     
     private void Awake()
     {
@@ -59,10 +60,28 @@ public class PlayerController : MonoBehaviour
 
         if (other.transform == nextTarget)
         {
+            // Gezegene ulaşmadan önce, bonus hakkımız var mıydı diye kontrol et.
+            if (_hasBonusPointChance)
+            {
+                // Evet, hakkımız vardı! Puanı ver.
+                GameManager.Instance.AddBonusScore(bonusScoreValue);
+                _hasBonusPointChance = false; // Hakkı kullandık, tekrar sıfırla.
+            }
+            
             AttachToPlanet(other.transform);
             other.GetComponent<Planet>()?.Activate();
             DestroyPreviousEnemySet();
             SpawnNewPlanetAndEnemies(other.transform);
+        }
+        // --- BONUS HAKKI KAZANMA DURUMU ---
+        else if (other.CompareTag("Puan"))
+        {
+            // Puan trigger'ına değdik. Bayrağı kaldır.
+            _hasBonusPointChance = true;
+
+            // Oyuncuya görsel/işitsel geri bildirim ver (bu çok önemlidir!) //if (bonusPointSound != null) audioSource.PlayOneShot(bonusPointSound);
+            if (bonusPointEffectPrefab != null)
+                Instantiate(bonusPointEffectPrefab, other.transform.position, Quaternion.identity);
         }
         else if (other.CompareTag("GeneratedEnemySet"))
         {
@@ -101,6 +120,8 @@ public class PlayerController : MonoBehaviour
     
     private void Launch()
     {
+
+        _hasBonusPointChance = false;
         if (nextTarget == null) return;
         
         currentState = PlayerState.Dashing;

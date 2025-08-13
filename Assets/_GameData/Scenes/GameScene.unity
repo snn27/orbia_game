@@ -1635,6 +1635,8 @@ MonoBehaviour:
   launchSound: {fileID: 8300000, guid: 8ac5cd7e3501a4e6080c2bd6fed81be0, type: 3}
   destroyEnemiesSound: {fileID: 8300000, guid: 7ebec7cbc6c344ae1911264064a3d184, type: 3}
   deathSound: {fileID: 8300000, guid: 7ebec7cbc6c344ae1911264064a3d184, type: 3}
+  bonusPointEffectPrefab: {fileID: 186387463177037040, guid: 9c95b622d97c54c509bf5bd8e389490d, type: 3}
+  bonusScoreValue: 5
 --- !u!1 &4396560976233259975
 GameObject:
   m_ObjectHideFlags: 0
@@ -1995,7 +1997,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 0ac274da743a5ab49a17c782a85c7f2d, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -2381,7 +2383,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 841ae3188ba4d9746ba4f4ed86597a98, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -2444,7 +2446,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: c398922a20f2f984db55718ac2c394f5, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
